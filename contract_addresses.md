@@ -1,1 +1,1 @@
-This file contains the latest test deployment addresses in the Cronos Testnet network<br/>Stake_Contract: [https://testnet.cronoscan.com//address/0x2354357cf65aE79d5827B3F20f2C53c5412FEbba](https://testnet.cronoscan.com//address/0x2354357cf65aE79d5827B3F20f2C53c5412FEbba)<br/>
+This file contains the latest test deployment addresses in the Cronos Testnet network<br/>Stake_Contract: [https://testnet.cronoscan.com//address/0xAb7153Af3162cBFcA9b063F101E68655351fac44](https://testnet.cronoscan.com//address/0xAb7153Af3162cBFcA9b063F101E68655351fac44)<br/>

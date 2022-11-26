@@ -9,39 +9,34 @@ import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 contract ERC721Staking is ReentrancyGuard {
     using SafeERC20 for IERC20;
 
-    // Interfaces for ERC20 and ERC721
-    IERC20 public immutable rewardsToken;
+    // Interfaces for ERC721
     IERC721 public immutable nftCollection;
 
     // Constructor function to set the rewards token and the NFT collection addresses
-    constructor(IERC721 _nftCollection, IERC20 _rewardsToken) {
+    constructor(IERC721 _nftCollection) {
         nftCollection = _nftCollection;
-        rewardsToken = _rewardsToken;
     }
 
     struct StakedToken {
         address staker;
         uint256 tokenId;
     }
-    
+
     // Staker info
     struct Staker {
         // Amount of tokens staked by the staker
         uint256 amountStaked;
-
         // Staked token ids
         StakedToken[] stakedTokens;
-
         // Last time of the rewards were calculated for this user
         uint256 timeOfLastUpdate;
-
         // Calculated, but unclaimed rewards for the User. The rewards are
         // calculated each time the user writes to the Smart Contract
         uint256 unclaimedRewards;
     }
 
     // Rewards per hour per token deposited in wei.
-    uint256 private rewardsPerHour = 100000;
+    uint256 private rewardsPerHour = 10000;
 
     // Mapping of User Address to Staker info
     mapping(address => Staker) public stakers;
@@ -82,10 +77,10 @@ contract ERC721Staking is ReentrancyGuard {
         // Update the mapping of the tokenId to the staker's address
         stakerAddress[_tokenId] = msg.sender;
 
-        // Update the timeOfLastUpdate for the staker   
+        // Update the timeOfLastUpdate for the staker
         stakers[msg.sender].timeOfLastUpdate = block.timestamp;
     }
-    
+
     // Check if user has any ERC721 Tokens Staked and if they tried to withdraw,
     // calculate the rewards and store them in the unclaimedRewards
     // decrement the amountStaked of the user and transfer the ERC721 token back to them
@@ -95,9 +90,12 @@ contract ERC721Staking is ReentrancyGuard {
             stakers[msg.sender].amountStaked > 0,
             "You have no tokens staked"
         );
-        
+
         // Wallet must own the token they are trying to withdraw
-        require(stakerAddress[_tokenId] == msg.sender, "You don't own this token!");
+        require(
+            stakerAddress[_tokenId] == msg.sender,
+            "You don't own this token!"
+        );
 
         // Update the rewards for this user, as the amount of rewards decreases with less tokens.
         uint256 rewards = calculateRewards(msg.sender);
@@ -107,8 +105,7 @@ contract ERC721Staking is ReentrancyGuard {
         uint256 index = 0;
         for (uint256 i = 0; i < stakers[msg.sender].stakedTokens.length; i++) {
             if (
-                stakers[msg.sender].stakedTokens[i].tokenId == _tokenId 
-                && 
+                stakers[msg.sender].stakedTokens[i].tokenId == _tokenId &&
                 stakers[msg.sender].stakedTokens[i].staker != address(0)
             ) {
                 index = i;
@@ -128,7 +125,7 @@ contract ERC721Staking is ReentrancyGuard {
         // Transfer the token back to the withdrawer
         nftCollection.transferFrom(address(this), msg.sender, _tokenId);
 
-        // Update the timeOfLastUpdate for the withdrawer   
+        // Update the timeOfLastUpdate for the withdrawer
         stakers[msg.sender].timeOfLastUpdate = block.timestamp;
     }
 
@@ -141,9 +138,8 @@ contract ERC721Staking is ReentrancyGuard {
         require(rewards > 0, "You have no rewards to claim");
         stakers[msg.sender].timeOfLastUpdate = block.timestamp;
         stakers[msg.sender].unclaimedRewards = 0;
-        rewardsToken.safeTransfer(msg.sender, rewards);
+        payable(msg.sender).transfer(rewards);
     }
-
 
     //////////
     // View //
@@ -155,11 +151,17 @@ contract ERC721Staking is ReentrancyGuard {
         return rewards;
     }
 
-    function getStakedTokens(address _user) public view returns (StakedToken[] memory) {
+    function getStakedTokens(address _user)
+        public
+        view
+        returns (StakedToken[] memory)
+    {
         // Check if we know this user
         if (stakers[_user].amountStaked > 0) {
             // Return all the tokens in the stakedToken Array for this user that are not -1
-            StakedToken[] memory _stakedTokens = new StakedToken[](stakers[_user].amountStaked);
+            StakedToken[] memory _stakedTokens = new StakedToken[](
+                stakers[_user].amountStaked
+            );
             uint256 _index = 0;
 
             for (uint256 j = 0; j < stakers[_user].stakedTokens.length; j++) {
@@ -171,7 +173,6 @@ contract ERC721Staking is ReentrancyGuard {
 
             return _stakedTokens;
         }
-        
         // Otherwise, return empty array
         else {
             return new StakedToken[](0);

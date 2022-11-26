@@ -7,7 +7,6 @@ import { stakeContractSol } from "../typechain-types/contracts";
 const addressFile = "contract_addresses.md";
 const gen1Address = "0xD0BD375a43B58Fd8329980898802667a64623F60";
 const gen2Address = "0x8ee54067dbb58d872424050234df6162aa27c06d";
-const rewardTokenAddress = "0x6a3173618859C7cd40fAF6921b5E9eB6A76f1fD4";
 
 const verify = async (addr: string, args: any[]) => {
   try {
@@ -31,8 +30,7 @@ async function main() {
 
   // deploy token contract
   const Stake_contract = await StakeContractFact.connect(deployer).deploy(
-    gen1Address,
-    rewardTokenAddress
+    gen1Address
   );
   // wait for the contract to deploy
   await Stake_contract.deployed();
@@ -61,7 +59,7 @@ async function main() {
   await new Promise((f) => setTimeout(f, 60000));
 
   //* Verify Contracts
-  await verify(Stake_contract.address, [gen1Address, rewardTokenAddress]);
+  await verify(Stake_contract.address, [gen1Address]);
 
   console.log("All done");
 }
