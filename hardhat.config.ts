@@ -1,6 +1,7 @@
 import { HardhatUserConfig } from "hardhat/config";
 import "@nomicfoundation/hardhat-toolbox";
 import "@nomiclabs/hardhat-etherscan";
+import "@cronos-labs/hardhat-cronoscan";
 import dotenv from "dotenv";
 dotenv.config();
 
@@ -26,24 +27,6 @@ const config: HardhatUserConfig = {
       cronosTestnet: `${process.env.CRONOSCAN_API_KEY}`,
       cronos: `${process.env.CRONOSCAN_API_KEY}`,
     },
-    customChains: [
-      {
-        network: "cronosTestnet",
-        chainId: 338,
-        urls: {
-          apiURL: "https://evm-t3.cronos.org/",
-          browserURL: "https://cronos.org/explorer/testnet3",
-        },
-      },
-      {
-        network: "cronos",
-        chainId: 25,
-        urls: {
-          apiURL: "https://evm.cronos.org/",
-          browserURL: "https://cronoscan.com/",
-        },
-      },
-    ],
   },
 };
 
