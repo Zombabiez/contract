@@ -1,4 +1,4 @@
-# Smart Contracts for giveNZtake
+# Smart Contracts for Zombabiez_Staking
 
 Smart Contracts for new token, shareORsteal game, vibers.
 

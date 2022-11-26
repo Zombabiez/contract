@@ -1,12 +1,11 @@
 {
-  "name": "givenztake",
+  "name": "zombabiez",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
     "generate:typechain": "npm run generate:oz-typechain && npm run generate:own-typechain",
-    "generate:oz-typechain": "npx typechain --target ethers-v5 --out-dir typechain/openzeppelin \"./artifacts/@openzeppelin/**/+([a-zA-Z0-9_]).json\"",
-    "generate:own-typechain": "npx typechain --target ethers-v5 --out-dir typechain/GIVN \"./artifacts/src/**/+([a-zA-Z0-9_]).json\""
+    "generate:oz-typechain": "npx typechain --target ethers-v5 --out-dir typechain/openzeppelin \"./artifacts/@openzeppelin/**/+([a-zA-Z0-9_]).json\""
   },
   "keywords": [],
   "author": "",
