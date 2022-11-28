@@ -2,7 +2,7 @@
 const { ethers } = require("hardhat");
 import hardhat from "hardhat";
 import * as fs from "fs";
-import { ZombabieStake } from "../typechain-types/contracts";
+import { ZombabieStake, ZombabiesNFT } from "../typechain-types/contracts";
 
 const addressFile = "contract_addresses.md";
 const gen1Address = "0xD0BD375a43B58Fd8329980898802667a64623F60";
@@ -27,39 +27,50 @@ async function main() {
   const deployer = accounts[0];
 
   const ZombabieStakeFact = await ethers.getContractFactory("ZombabieStake");
+  const ZombabiesNFTFact = await ethers.getContractFactory("ZombabiesNFT");
 
   // deploy zombabie staking contract for gen1 collection
-  const ZombabieStakePool1Contract = await ZombabieStakeFact.connect(
+  const ZombabiesNFTContract = (await ZombabiesNFTFact.connect(deployer).deploy(
+    "Zombabies",
+    "ZOM",
+    "ipfs://QmeLnMBvjfdMqBT6vXPBXmC8dKEUVuWvNsvMthqxqFwUcg/",
+    "ipfs://QmeLnMBvjfdMqBT6vXPBXmC8dKEUVuWvNsvMthqxqFwUcg/1.json"
+  )) as ZombabiesNFT;
+  // wait for the contract to deploy
+  await ZombabiesNFTContract.deployed();
+  // deploy zombabie staking contract for gen1 collection
+
+  const ZombabieStakePool1Contract = (await ZombabieStakeFact.connect(
     deployer
-  ).deploy(gen1Address);
+  ).deploy(ZombabiesNFTContract.address)) as ZombabieStake;
   // wait for the contract to deploy
   await ZombabieStakePool1Contract.deployed();
 
   // deploy zombabie staking contract for pool2 collection
-  const ZombabieStakePool2Contract = await ZombabieStakeFact.connect(
+  const ZombabieStakePool2Contract = (await ZombabieStakeFact.connect(
     deployer
-  ).deploy(gen2Address);
+  ).deploy(ZombabiesNFTContract.address)) as ZombabieStake;
   // wait for the contract to deploy
   await ZombabieStakePool2Contract.deployed();
 
   // deploy zombabie staking contract for pool3 collection
-  const ZombabieStakePool3Contract = await ZombabieStakeFact.connect(
+  const ZombabieStakePool3Contract = (await ZombabieStakeFact.connect(
     deployer
-  ).deploy(gen2Address);
+  ).deploy(ZombabiesNFTContract.address)) as ZombabieStake;
   // wait for the contract to deploy
   await ZombabieStakePool3Contract.deployed();
 
   // deploy zombabie staking contract for pool4 collection
-  const ZombabieStakePool4Contract = await ZombabieStakeFact.connect(
+  const ZombabieStakePool4Contract = (await ZombabieStakeFact.connect(
     deployer
-  ).deploy(gen2Address);
+  ).deploy(ZombabiesNFTContract.address)) as ZombabieStake;
   // wait for the contract to deploy
   await ZombabieStakePool4Contract.deployed();
 
   // deploy zombabie staking contract for pool5 collection
-  const ZombabieStakePool5Contract = await ZombabieStakeFact.connect(
+  const ZombabieStakePool5Contract = (await ZombabieStakeFact.connect(
     deployer
-  ).deploy(gen2Address);
+  ).deploy(ZombabiesNFTContract.address)) as ZombabieStake;
   // wait for the contract to deploy
   await ZombabieStakePool5Contract.deployed();
 
@@ -67,7 +78,7 @@ async function main() {
   const writeAddr = (addr: string, name: string) => {
     fs.appendFileSync(
       addressFile,
-      `${name}: [https://testnet.cronoscan.com//address/${addr}](https://testnet.cronoscan.com//address/${addr})<br/>`
+      `${name}: [https://testnet.cronoscan.com/address/${addr}](https://testnet.cronoscan.com/address/${addr})<br/>`
     );
   };
 
@@ -79,6 +90,7 @@ async function main() {
     addressFile,
     "This file contains the latest test deployment addresses in the Cronos Testnet network<br/>"
   );
+  writeAddr(ZombabiesNFTContract.address, "ZombabiesNFTContract");
   writeAddr(ZombabieStakePool1Contract.address, "ZombabieStakePool1Contract");
   writeAddr(ZombabieStakePool2Contract.address, "ZombabieStakePool2Contract");
   writeAddr(ZombabieStakePool3Contract.address, "ZombabieStakePool3Contract");
@@ -91,11 +103,32 @@ async function main() {
   await new Promise((f) => setTimeout(f, 60000));
 
   //* Verify Contracts
-  await verify(ZombabieStakePool1Contract.address, [gen1Address]);
-  await verify(ZombabieStakePool2Contract.address, [gen2Address]);
-  await verify(ZombabieStakePool3Contract.address, [gen2Address]);
-  await verify(ZombabieStakePool4Contract.address, [gen2Address]);
-  await verify(ZombabieStakePool5Contract.address, [gen2Address]);
+  // await verify(ZombabieStakePool1Contract.address, [gen1Address]);
+  // await verify(ZombabieStakePool2Contract.address, [gen2Address]);
+  // await verify(ZombabieStakePool3Contract.address, [gen2Address]);
+  // await verify(ZombabieStakePool4Contract.address, [gen2Address]);
+  // await verify(ZombabieStakePool5Contract.address, [gen2Address]);
+  await verify(ZombabiesNFTContract.address, [
+    "Zombabies",
+    "ZOM",
+    "ipfs://QmeLnMBvjfdMqBT6vXPBXmC8dKEUVuWvNsvMthqxqFwUcg/",
+    "ipfs://QmeLnMBvjfdMqBT6vXPBXmC8dKEUVuWvNsvMthqxqFwUcg/1.json",
+  ]);
+  await verify(ZombabieStakePool1Contract.address, [
+    ZombabiesNFTContract.address,
+  ]);
+  await verify(ZombabieStakePool2Contract.address, [
+    ZombabiesNFTContract.address,
+  ]);
+  await verify(ZombabieStakePool3Contract.address, [
+    ZombabiesNFTContract.address,
+  ]);
+  await verify(ZombabieStakePool4Contract.address, [
+    ZombabiesNFTContract.address,
+  ]);
+  await verify(ZombabieStakePool5Contract.address, [
+    ZombabiesNFTContract.address,
+  ]);
 
   console.log("All done");
 }
