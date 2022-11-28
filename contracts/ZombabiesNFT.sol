@@ -11,7 +11,7 @@ contract ZombabiesNFT is ERC721Enumerable, Ownable {
 
     string baseURI;
     string public baseExtension = ".json";
-    uint256 public cost = 10 ^ 11 wei;
+    uint256 public cost = 10 ^ 12;
     uint256 public maxSupply = 2500;
     uint256 public maxMintAmount = 20;
     bool public paused = false;

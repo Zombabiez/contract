@@ -5,8 +5,9 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 
-contract ZombabieStake is ReentrancyGuard {
+contract ZombabieStake is ReentrancyGuard, Ownable {
     using SafeERC20 for IERC20;
     uint256 public totalStaked = 0;
 
@@ -37,7 +38,7 @@ contract ZombabieStake is ReentrancyGuard {
     }
 
     // Rewards per hour per token deposited in wei.
-    uint256 private rewardsPerHour = 10000;
+    uint256 private rewardsPerHour = 13 * (10 ^ 15);
 
     // Mapping of User Address to Staker info
     mapping(address => Staker) public stakers;
@@ -45,6 +46,10 @@ contract ZombabieStake is ReentrancyGuard {
     // Mapping of Token Id to staker. Made for the SC to remember
     // who to send back the ERC721 Token to.
     mapping(uint256 => address) public stakerAddress;
+
+    function setRewardsPerHour(uint256 _newCost) public onlyOwner {
+        rewardsPerHour = _newCost;
+    }
 
     // If address already has ERC721 Token/s staked, calculate the rewards.
     // Increment the amountStaked and map msg.sender to the Token Id of the staked
