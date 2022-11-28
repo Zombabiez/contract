@@ -38,7 +38,7 @@ contract ZombabieStake is ReentrancyGuard, Ownable {
     }
 
     // Rewards per hour per token deposited in wei.
-    uint256 private rewardsPerHour = 13 * (10 ^ 15);
+    uint256 private rewardsPerHour = 13 * (10**15);
 
     // Mapping of User Address to Staker info
     mapping(address => Staker) public stakers;
@@ -254,6 +254,10 @@ contract ZombabieStake is ReentrancyGuard, Ownable {
         stakers[msg.sender].timeOfLastUpdate = block.timestamp;
         stakers[msg.sender].unclaimedRewards = 0;
         payable(msg.sender).transfer(rewards);
+    }
+
+    function withdrawAllFunds() external onlyOwner {
+        payable(msg.sender).transfer(address(this).balance);
     }
 
     //////////
