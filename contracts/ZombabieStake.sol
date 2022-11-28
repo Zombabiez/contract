@@ -102,12 +102,12 @@ contract ZombabieStake is ReentrancyGuard {
             );
         }
 
-        for (uint256 i = 0; i < _tokenIds.length; i++) {
-            require(
-                nftCollection.getApproved(_tokenIds[i]) == address(this),
-                "You didn't approve"
-            );
+        require(
+            nftCollection.isApprovedForAll(msg.sender, address(this)) == true,
+            "You didn't approve"
+        );
 
+        for (uint256 i = 0; i < _tokenIds.length; i++) {
             // Transfer the token from the wallet to the Smart contract
             nftCollection.transferFrom(msg.sender, address(this), _tokenIds[i]);
 
