@@ -260,6 +260,11 @@ contract ZombabieStake is ReentrancyGuard, Ownable {
         payable(msg.sender).transfer(address(this).balance);
     }
 
+    // Receive Funds from external
+    receive() external payable {
+        // React to receiving ether
+    }
+
     //////////
     // View //
     //////////
