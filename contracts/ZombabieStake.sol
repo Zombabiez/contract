@@ -37,19 +37,12 @@ contract ZombabieStake is ReentrancyGuard, Ownable {
         uint256 unclaimedRewards;
     }
 
-    // Rewards per hour per token deposited in wei.
-    uint256 private rewardsPerHour = 13 * (10**15);
-
     // Mapping of User Address to Staker info
     mapping(address => Staker) public stakers;
 
     // Mapping of Token Id to staker. Made for the SC to remember
     // who to send back the ERC721 Token to.
     mapping(uint256 => address) public stakerAddress;
-
-    function setRewardsPerHour(uint256 _newCost) public onlyOwner {
-        rewardsPerHour = _newCost;
-    }
 
     // If address already has ERC721 Token/s staked, calculate the rewards.
     // Increment the amountStaked and map msg.sender to the Token Id of the staked
@@ -280,8 +273,8 @@ contract ZombabieStake is ReentrancyGuard, Ownable {
     }
 
     function getMonthlyRate(address _staker) public view returns (uint256) {
-        return
-            (30 days * stakers[_staker].amountStaked * rewardsPerHour) / 3600;
+        uint256 rewardsPerHour = getRewardPerHour();
+        return stakers[_staker].amountStaked * rewardsPerHour * 24 * 30;
     }
 
     function getStakedTokens(address _user)
@@ -312,21 +305,23 @@ contract ZombabieStake is ReentrancyGuard, Ownable {
         }
     }
 
-    /////////////
-    // Internal//
-    /////////////
+    //////////////
+    // Internal //
+    //////////////
 
     // Calculate rewards for param _staker by calculating the time passed
     // since last update in hours and mulitplying it to ERC721 Tokens Staked
     // and rewardsPerHour.
-    function calculateRewards(address _staker)
-        internal
-        view
-        returns (uint256 _rewards)
-    {
+    function calculateRewards(address _staker) internal view returns (uint256) {
+        uint256 rewardsPerHour = getRewardPerHour();
         return (((
             ((block.timestamp - stakers[_staker].timeOfLastUpdate) *
                 stakers[_staker].amountStaked)
         ) * rewardsPerHour) / 3600);
+    }
+
+    function getRewardPerHour() internal view returns (uint256) {
+        if (totalStaked == 0) return 0;
+        return address(this).balance / totalStaked / (30 * 24);
     }
 }
